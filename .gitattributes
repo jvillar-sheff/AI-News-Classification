@@ -1,0 +1,4 @@
+models/Distilbert/distilbert-final/model.safetensors filter=lfs diff=lfs merge=lfs -text
+data/* filter=lfs diff=lfs merge=lfs -text
+models/Distilbert/distilbert-eval/* filter=lfs diff=lfs merge=lfs -text
+models/Distilbert/distilbert-checkpoints/* filter=lfs diff=lfs merge=lfs -text

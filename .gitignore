@@ -1,0 +1,82 @@
+# ----------------------------------------------------
+# 1. CORE PYTHON / VIRTUAL ENVIRONMENTS
+# ----------------------------------------------------
+.venv/
+.env
+ENV/
+env/
+venv/
+
+# Python Cache Files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+
+# Python Build Files
+build/
+dist/
+*.egg-info/
+
+# ----------------------------------------------------
+# 2. DATA ARTIFACTS AND CHECKPOINTS (CRITICAL EXCLUSIONS)
+# ----------------------------------------------------
+
+# Full data directory output from Notebook 1
+data/
+
+# IGNORE all intermediate model checkpoints (e.g., checkpoint-250, checkpoint-375)
+# These are huge and cause the GitHub 100MB limit rejection (GH001).
+models/Distilbert/distilbert-checkpoints/
+models/Distilbert/RoBERT/
+
+# Ignore large optimizer/trainer state files that often exceed 100MB
+*.pt
+*.bin
+
+# PyTorch / HuggingFace Logs
+lightning_logs/
+runs/
+
+# ----------------------------------------------------
+# 3. DEVELOPMENT / CACHE EXCLUSIONS
+# ----------------------------------------------------
+
+# Jupyter Notebook Cache
+.ipynb_checkpoints/
+# Removed the redundant **/.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+*.out
+*.err
+
+# HuggingFace Cache (Global Caches)
+/content/
+/root/.cache/
+/root/.config/
+/home/*/.cache/huggingface/
+/usr/.cache/huggingface/
+~/.cache/huggingface/
+.cache/huggingface/
+
+# ----------------------------------------------------
+# 4. DO NOT IGNORE (EXCEPTIONS)
+# ----------------------------------------------------
+
+# CRITICALLY, DO NOT IGNORE the final model directory OR the models root.
+# The final model is tracked by Git LFS.
+!models/
+!models/**
+# Removed redundant !data/ and !data/** because we are now ignoring the full data folder (data/) in Section 2.
+!models/Distilbert/distilbert-final/
+!models/Distilbert/distilbert-final/**
