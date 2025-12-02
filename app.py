@@ -4,11 +4,11 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import numpy as np
 import os
 import pandas as pd
-import json # <-- Added for dynamic message
+import json
 
 # --- Configuration ---
 MODEL_DIR = "./models/Distilbert/distilbert-final"
-EVAL_OUTPUT_DIR = "./models/Distilbert/distilbert-eval" # Path to evaluation metrics
+EVAL_OUTPUT_DIR = "./models/Distilbert/distilbert-eval"
 MAX_LENGTH = 128
 CLASS_NAMES = {
     0: "World",
@@ -24,7 +24,6 @@ def get_model_metrics():
         try:
             with open(report_path, 'r') as f:
                 report = json.load(f)
-                # Fetching the accuracy percentage from the saved report
                 accuracy = report['overall_metrics']['accuracy_percentage']
                 f1_macro = report['overall_metrics']['f1_macro']
                 return f"Acc: {accuracy:.2f}% | F1: {f1_macro:.4f}"
@@ -60,7 +59,7 @@ def load_classification_model(model_path):
         metrics_string = get_model_metrics()
         
         # Display dynamic success message
-        st.success(f"✅ Loaded Model: DistilBERT ({metrics_string}) on {device.type.upper()}!")
+        st.success(f"✅ Loaded Model: DistilBERT ({metrics_string})!")
         
         return model, tokenizer, device
     except Exception as e:
@@ -98,12 +97,15 @@ def classify_news(text, model, tokenizer, device):
 # --- Streamlit Application Layout ---
 def main():
     st.set_page_config(
-        page_title="DistilBERT News Classifier",
+        page_title="NLP News Classifier", # CHANGED: Updated page title
         layout="centered"
     )
     
-    st.title("📰 DistilBERT News Classifier")
-    st.markdown("A fine-tuned **DistilBERT** model to classify news articles into one of four categories: World, Sports, Business, or Sci/Tech.")
+    st.title("📰 NLP News Classifier") # CHANGED: Updated H1 title
+    
+    # CHANGED: Updated description as requested
+    st.markdown("News Classifying Interface built using a fine-tuned NLP model. It categorizes articles into one of four topics: World, Sports, Business, or Sci/Tech.")
+    st.caption("Built by Joaquin Villar Urrutia")
 
     # Load Model (cached) - Dynamic message appears here
     model, tokenizer, device = load_classification_model(MODEL_DIR)
