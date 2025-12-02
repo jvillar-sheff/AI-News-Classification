@@ -3,11 +3,12 @@ import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import numpy as np
 import os
-import pandas as pd # <-- FIXED: Moved pandas import to the top
+import pandas as pd
+import json # <-- Added for dynamic message
 
 # --- Configuration ---
-# FIXED: Updated path based on your directory structure
 MODEL_DIR = "./models/Distilbert/distilbert-final"
+EVAL_OUTPUT_DIR = "./models/Distilbert/distilbert-eval" # Path to evaluation metrics
 MAX_LENGTH = 128
 CLASS_NAMES = {
     0: "World",
@@ -16,11 +17,26 @@ CLASS_NAMES = {
     3: "Sci/Tech"
 }
 
+def get_model_metrics():
+    """Reads the macro F1 score and accuracy from the saved evaluation report."""
+    report_path = os.path.join(EVAL_OUTPUT_DIR, "evaluation_report.json")
+    if os.path.exists(report_path):
+        try:
+            with open(report_path, 'r') as f:
+                report = json.load(f)
+                # Fetching the accuracy percentage from the saved report
+                accuracy = report['overall_metrics']['accuracy_percentage']
+                f1_macro = report['overall_metrics']['f1_macro']
+                return f"Acc: {accuracy:.2f}% | F1: {f1_macro:.4f}"
+        except (IOError, KeyError, json.JSONDecodeError):
+            return "Metrics Unavailable (Error Reading File)"
+    return "Metrics Unavailable (File Not Found)"
+
 @st.cache_resource
 def load_classification_model(model_path):
     """Loads the fine-tuned DistilBERT model and tokenizer."""
     if not os.path.exists(model_path):
-        st.error(f"Model directory not found at {model_path}.")
+        st.error(f"❌ Model directory not found at {model_path}. Please run Notebook 2.")
         st.stop()
 
     try:
@@ -39,10 +55,16 @@ def load_classification_model(model_path):
         )
 
         model.eval()
-        st.success(f"Model loaded successfully on {device}!")
+
+        # Generate the new dynamic success message
+        metrics_string = get_model_metrics()
+        
+        # Display dynamic success message
+        st.success(f"✅ Loaded Model: DistilBERT ({metrics_string}) on {device.type.upper()}!")
+        
         return model, tokenizer, device
     except Exception as e:
-        st.error(f"Error loading model from {model_path}: {e}")
+        st.error(f"❌ Error loading model from {model_path}: {e}")
         st.stop()
         
 def classify_news(text, model, tokenizer, device):
@@ -83,7 +105,7 @@ def main():
     st.title("📰 DistilBERT News Classifier")
     st.markdown("A fine-tuned **DistilBERT** model to classify news articles into one of four categories: World, Sports, Business, or Sci/Tech.")
 
-    # Load Model (cached)
+    # Load Model (cached) - Dynamic message appears here
     model, tokenizer, device = load_classification_model(MODEL_DIR)
 
     # User Input Area
@@ -121,23 +143,18 @@ def main():
                     labels = [item[0] for item in sorted_probs]
                     scores = [item[1] for item in sorted_probs]
                     
-                    # Simple bar chart (Now works because pd is imported at the top)
+                    # Simple bar chart
                     prob_df = pd.DataFrame(scores, index=labels, columns=['Probability'])
                     st.bar_chart(prob_df, color="#1967D2")
 
                 except Exception as e:
+                    # Catch and display classification errors cleanly
                     st.error(f"An error occurred during classification: {e}")
         else:
             st.warning("Please enter some text to classify.")
 
     st.markdown("---")
-    st.caption("Model: Fine-tuned DistilBERT on AG News Dataset. Accuracy: 88.80%")
-    
-    # REMOVED the unnecessary local pandas import block
-    # try:
-    #     import pandas as pd
-    # except ImportError:
-    #     pass 
+    st.caption("Model performance metrics are derived from the evaluation step in Notebook 3.")
 
 if __name__ == "__main__":
     main()
