@@ -1,14 +1,6 @@
-# Core
-pandas
-numpy
-scikit-learn
-
-#Hugging Face Transformers Libraries
+streamlit
+torch
 transformers
-torch 
-accelerate 
-
-#Extra
-streamlit 
-matplotlib
-seaborn
+peft
+pandas
+huggingface_hub
